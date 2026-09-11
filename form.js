@@ -81,6 +81,11 @@
       });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       form.reset();
+      // Only a confirmed webhook success is a Lead. Analytics errors must
+      // never turn an accepted inquiry into a form error or trigger resubmission.
+      try {
+        await window.gekitaiMeta?.lead(submissionId);
+      } catch (_) { /* Continue to the completion page if measurement fails. */ }
       location.assign(new URL('./thank-you.html', location.href).href);
     } catch (error) {
       showError(error.name === 'AbortError'
